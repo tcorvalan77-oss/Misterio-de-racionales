@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Misterio de los Racionales - Escape Room de Matemática</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Cinzel for mystery library vibe -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .font-serif-title {
+            font-family: 'Cinzel', serif;
+        }
+        .glow-amber {
+            box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.3);
+        }
+        .glow-blue {
+            box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.3);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-900">
+
+    <!-- Accessible Top Bar -->
+    <header class="bg-slate-900/90 border-b border-slate-800 backdrop-blur-md sticky top-0 z-50 py-3 px-4 sm:px-8">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl" aria-hidden="true">📜</span>
+                <div>
+                    <h1 class="font-serif-title text-lg sm:text-xl font-bold text-amber-400 tracking-wide">El Misterio de los Racionales</h1>
+                    <p class="text-xs text-slate-400">1.º Medio · Módulo de Matemática</p>
+                </div>
+            </div>
+
+            <!-- Team Badge & Controls -->
+            <div class="flex items-center space-x-3 text-sm">
+                <div id="teamBadge" class="hidden sm:flex items-center bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg text-slate-300">
+                    <span class="text-xs text-slate-400 mr-2">Equipo:</span>
+                    <span id="teamCodeDisplay" class="font-bold text-amber-300">--</span>
+                </div>
+
+                <!-- Accessibility Audio Toggle Button -->
+                <button id="soundToggleBtn" onclick="toggleSound()" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 transition-colors flex items-center space-x-1" title="Alternar Efectos de Sonido">
+                    <span id="soundIcon">🔊</span>
+                    <span class="sr-only">Sonido</span>
+                </button>
+
+                <!-- High Contrast Toggle -->
+                <button onclick="toggleContrast()" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 transition-colors" title="Modo Alto Contraste">
+                    👁️
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-5xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
+
+        <!-- SCREEN 1: Setup / Registration Screen -->
+        <section id="screenSetup" class="bg-slate-900/80 border border-amber-900/40 rounded-2xl p-6 sm:p-10 glow-amber text-center">
+            <div class="max-w-2xl mx-auto space-y-6">
+                <div class="inline-block p-4 bg-amber-500/10 rounded-full border border-amber-500/30 mb-2">
+                    <span class="text-5xl">🏰</span>
+                </div>
+                <h2 class="font-serif-title text-3xl sm:text-4xl font-extrabold text-amber-400">Atrapados en la Biblioteca Antigua</h2>
+                
+                <p class="text-slate-300 text-base sm:text-lg leading-relaxed">
+                    «Las puertas pesadas de la biblioteca secreta se han cerrado. Para encontrar la llave de escape, deben resolver cinco desafíos matemáticos en equipo, registrar sus respuestas y justificar cada procedimiento.»
+                </p>
+
+                <!-- Instructions Card -->
+                <div class="bg-slate-800/80 border border-slate-700 text-left p-5 rounded-xl space-y-2 text-sm text-slate-300">
+                    <h3 class="font-bold text-amber-300 text-base flex items-center">
+                        <span class="mr-2">📋</span> Instrucciones de Misión:
+                    </h3>
+                    <p>• Trabajen en equipo para resolver las cinco misiones y escapar de la biblioteca.</p>
+                    <p>• En cada desafío, escriban la respuesta exacta y expliquen brevemente cómo llegaron a ella.</p>
+                    <p>• Si necesitan ayuda, utilicen las pistas y vuelvan a intentarlo.</p>
+                </div>
+
+                <!-- Registration Form -->
+                <div class="pt-4 space-y-4 max-w-md mx-auto text-left">
+                    <div>
+                        <label for="inputTeamCode" class="block text-sm font-semibold text-slate-300 mb-1">Código o Nombre del Equipo:</label>
+                        <input type="text" id="inputTeamCode" placeholder="Ej: Equipo Alfa-12" class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition">
+                        <p class="text-xs text-slate-500 mt-1">🔒 Declaración ética: No uses nombres reales de estudiantes.</p>
+                    </div>
+
+                    <button onclick="startEscapeRoom()" class="w-full py-4 bg-amber-600 hover:bg-amber-500 active:bg-amber-700 text-slate-950 font-extrabold text-lg rounded-xl shadow-lg hover:shadow-amber-500/25 transition transform hover:-translate-y-0.5">
+                        ¡Ingresar a la Biblioteca y Comenzar! 🗝️
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 2: Active Escape Room Mission Screen -->
+        <section id="screenMission" class="hidden flex-col space-y-6">
+            
+            <!-- Progress Stepper -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4">
+                <div class="flex justify-between items-center text-xs sm:text-sm font-medium mb-3 text-slate-400">
+                    <span>Progreso del Escape</span>
+                    <span id="progressText" class="text-amber-400 font-bold">Misión 1 de 5</span>
+                </div>
+                <div class="grid grid-cols-5 gap-2">
+                    <div id="step1" class="h-2.5 rounded-full bg-amber-500 transition-all duration-300"></div>
+                    <div id="step2" class="h-2.5 rounded-full bg-slate-800 transition-all duration-300"></div>
+                    <div id="step3" class="h-2.5 rounded-full bg-slate-800 transition-all duration-300"></div>
+                    <div id="step4" class="h-2.5 rounded-full bg-slate-800 transition-all duration-300"></div>
+                    <div id="step5" class="h-2.5 rounded-full bg-slate-800 transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <!-- Mission Content Card -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl relative overflow-hidden">
+                
+                <!-- Mission Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-4 gap-2">
+                    <div>
+                        <span id="missionTag" class="text-xs font-bold uppercase tracking-wider px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30">Misión 1</span>
+                        <h2 id="missionTitle" class="font-serif-title text-2xl sm:text-3xl font-bold text-slate-100 mt-2">Cargando Misión...</h2>
+                    </div>
+                    <div class="flex items-center space-x-2 text-slate-400 text-sm">
+                        <span>🔑 Claves obtenidas:</span>
+                        <span id="keysCount" class="font-bold text-amber-400 text-lg">0 / 5</span>
+                    </div>
+                </div>
+
+                <!-- Scenario & Math Challenge Description -->
+                <div class="space-y-4">
+                    <div class="bg-slate-950/60 p-4 sm:p-5 rounded-xl border border-slate-800/80 text-slate-300 leading-relaxed text-sm sm:text-base" id="missionStory">
+                        <!-- Story text injected dynamically -->
+                    </div>
+
+                    <!-- Visual / Pictorial Representation Box -->
+                    <div id="visualAidContainer" class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col items-center justify-center min-h-[120px]">
+                        <!-- SVG / Visual aid dynamically generated -->
+                    </div>
+
+                    <div class="bg-amber-950/20 border border-amber-500/30 p-4 rounded-xl text-amber-200">
+                        <h4 class="font-bold text-amber-400 text-sm uppercase tracking-wide mb-1">Desafío Matemático:</h4>
+                        <p id="missionPrompt" class="text-base sm:text-lg font-medium text-amber-100">Cargando desafío...</p>
+                    </div>
+                </div>
+
+                <!-- Student Answer & Justification Input Form -->
+                <div class="space-y-4 pt-2">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Numerical / Fraction Answer -->
+                        <div>
+                            <label for="inputAnswer" class="block text-sm font-semibold text-slate-300 mb-1">
+                                1. Respuesta Matemática:
+                            </label>
+                            <input type="text" id="inputAnswer" placeholder="Ej: 3/4 o 0.75" class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 text-base">
+                            <p class="text-xs text-slate-400 mt-1" id="formatHelp">Ingresa fracción (a/b) o decimal (usando punto o coma).</p>
+                        </div>
+
+                        <!-- Justification / Reasoning (Requires Higher Order Thinking) -->
+                        <div>
+                            <label for="inputJustification" class="block text-sm font-semibold text-slate-300 mb-1">
+                                2. Justificación del Procedimiento (Mínimo 10 caracteres):
+                            </label>
+                            <textarea id="inputJustification" rows="2" placeholder="Explica cómo llegaron a esta solución y por qué tiene sentido..." class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Actions & Hints -->
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
+                        <!-- Hint Button -->
+                        <button onclick="toggleHint()" type="button" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-amber-300 text-sm font-medium transition flex items-center justify-center space-x-2">
+                            <span>💡 ¿Necesitan una pista?</span>
+                            <span id="hintLevelBadge" class="text-xs bg-slate-900 px-2 py-0.5 rounded text-slate-400">(Pista 1/2)</span>
+                        </button>
+
+                        <!-- Validation Submit Button -->
+                        <button onclick="validateCurrentMission()" class="px-8 py-3.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-900/30 transition transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                            <span>Verificar Respuesta y Avanzar</span>
+                            <span>🔓</span>
+                        </button>
+                    </div>
+
+                    <!-- Hint Box (Initially Hidden) -->
+                    <div id="hintBox" class="hidden bg-slate-950 border border-amber-500/40 p-4 rounded-xl text-amber-200 text-sm space-y-2">
+                        <div class="flex items-center space-x-2 font-bold text-amber-400">
+                            <span>💡 Pista del Archivero:</span>
+                        </div>
+                        <p id="hintText">Pista no cargada.</p>
+                    </div>
+
+                    <!-- Feedback Alert Message -->
+                    <div id="feedbackBox" class="hidden p-4 rounded-xl border text-sm font-medium leading-relaxed">
+                        <!-- Feedback injected dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 3: Completion / Record Summary Screen -->
+        <section id="screenSummary" class="hidden bg-slate-900 border border-amber-500/50 rounded-2xl p-6 sm:p-10 glow-amber text-center space-y-8">
+            <div class="max-w-3xl mx-auto space-y-6">
+                <div class="inline-block p-4 bg-emerald-500/20 rounded-full border border-emerald-500/40">
+                    <span class="text-6xl">🎉</span>
+                </div>
+                
+                <h2 class="font-serif-title text-3xl sm:text-5xl font-extrabold text-amber-400">¡Han Escapado de la Biblioteca!</h2>
+                <p class="text-slate-300 text-lg">
+                    Felicitaciones al <span id="summaryTeamCode" class="font-bold text-amber-300"></span>. Han demostrado un excelente dominio de las operaciones y la argumentación con números racionales.
+                </p>
+
+                <!-- Record Worksheet Table (Evidencia de Aprendizaje) -->
+                <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 text-left space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <h3 class="font-bold text-amber-300 text-lg flex items-center">
+                            <span class="mr-2">📄</span> Hoja de Registro de Evidencias
+                        </h3>
+                        <span class="text-xs bg-slate-800 px-3 py-1 rounded-full text-slate-400">Para Evaluación Docente</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-slate-300">
+                            <thead class="text-xs uppercase bg-slate-900 text-slate-400 border-b border-slate-800">
+                                <tr>
+                                    <th class="py-3 px-3">Misión</th>
+                                    <th class="py-3 px-3">Respuesta</th>
+                                    <th class="py-3 px-3">Justificación y Procedimiento</th>
+                                    <th class="py-3 px-3 text-center">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="summaryTableBody" class="divide-y divide-slate-800/60">
+                                <!-- Dynamically populated rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Export / Copy Record Option -->
+                <div class="flex flex-col sm:flex-row justify-center gap-4 pt-2">
+                    <button onclick="copySummaryToClipboard()" class="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl transition flex items-center justify-center space-x-2 shadow-lg">
+                        <span>📋 Copiar Registro para la Docente</span>
+                    </button>
+                    <button onclick="window.print()" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold border border-slate-700 rounded-xl transition flex items-center justify-center space-x-2">
+                        <span>🖨️ Imprimir / Guardar en PDF</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer with Pedagogical Atribution -->
+    <footer class="bg-slate-950 border-t border-slate-900 py-4 px-4 text-center text-xs text-slate-500">
+        <p>Recurso Educativo Diseñado por Teresa Corvalán · Módulo 3: Diplomado en IA y Tecnologías Digitales · UMCE</p>
+        <p class="mt-1 text-slate-600">Alineado con las Bases Curriculares de Matemática (1.º Medio) · Licencia de Uso Educativo</p>
+    </footer>
+
+    <!-- Audio Web API Sound Effects Engine (No external sound files required) -->
+    <script>
+        // Web Audio API Synth Engine for accessibility & engagement
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'success') {
+                    // Upward Arpeggio Sound
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now); // A4
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.15); // A5
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'error') {
+                    // Low Buzzer Sound
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.linearRampToValueAtTime(120, now + 0.2);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'unlock') {
+                    // Unlock Mystery Chime
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    osc.start(now);
+                    osc.stop(now + 0.5);
+                }
+            } catch (e) {
+                console.log('Audio playback prevented or unsupported');
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundIcon').innerText = soundEnabled ? '🔊' : '🔇';
+        }
+
+        function toggleContrast() {
+            document.body.classList.toggle('contrast-125');
+            document.body.classList.toggle('brightness-110');
+        }
+    </script>
+
+    <!-- Escape Room Main Application Logic -->
+    <script>
+        // Data Structure for the 5 Missions (Progressive Difficulty)
+        const missionsData = [
+            {
+                id: 1,
+                title: "Misión 1: El Manuscrito Perdido",
+                topic: "Representación y Comparación de Racionales",
+                story: "Encontraron un pergamino antiguo con dos mapas marcados con valores racionales. Para abrir el primer cofre y hallar el pergamino faltante, deben determinar cuál de los mapas ofrece la ruta más corta.",
+                visualSvg: `
+                    <svg width="280" height="90" viewBox="0 0 280 90" class="max-w-full">
+                        <rect x="10" y="20" width="110" height="50" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+                        <text x="65" y="50" fill="#f8fafc" font-size="16" font-weight="bold" text-anchor="middle">Ruta A: 5/8 km</text>
+                        <rect x="160" y="20" width="110" height="50" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="215" y="50" fill="#f8fafc" font-size="16" font-weight="bold" text-anchor="middle">Ruta B: 0.7 km</text>
+                    </svg>
+                `,
+                prompt: "¿Cuál de las dos rutas es MÁS CORTA: la Ruta A (5/8 km) o la Ruta B (0.7 km)? Escribe la ruta elegida (Ruta A o Ruta B) o su valor exacto.",
+                validAnswers: ["ruta a", "5/8", "0.625", "a"],
+                hints: [
+                    "Pista 1: Convierte la fracción 5/8 a decimal dividiendo 5 en 8 (5 ÷ 8 = 0.625).",
+                    "Pista 2: Compara 0.625 con 0.700. ¿Cuál número es menor?"
+                ],
+                explanation: "¡Correcto! 5/8 es equivalente a 0.625, lo cual es menor que 0.7 (o 0.700). Por lo tanto, la Ruta A es más corta."
+            },
+            {
+                id: 2,
+                title: "Misión 2: La Balanza de los Tomos",
+                topic: "Adición y Sustracción de Fracciones y Decimales",
+                story: "Para activar el mecanismo del estante central, necesitan equilibrar dos estantes de libros. El primer estante pesa 3/4 kg y le agregaron un tomo de 1/2 kg. El segundo estante pesa 0.4 kg y necesitan agregarle un contrapeso exacto para igualar el peso total.",
+                visualSvg: `
+                    <svg width="300" height="100" viewBox="0 0 300 100" class="max-w-full">
+                        <!-- Balance scale graphic -->
+                        <path d="M 50 80 L 250 80 M 150 80 L 150 20 M 100 20 L 200 20" stroke="#94a3b8" stroke-width="4"/>
+                        <circle cx="100" cy="40" r="22" fill="#d97706"/>
+                        <text x="100" y="45" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">3/4 + 1/2 kg</text>
+                        <circle cx="200" cy="40" r="22" fill="#2563eb"/>
+                        <text x="200" y="45" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">0.4 + ? kg</text>
+                    </svg>
+                `,
+                prompt: "¿Cuántos kg debe pesar el contrapeso faltante para que ambos estantes tengan exactamente el mismo peso total?",
+                validAnswers: ["0.85", "17/20", "0,85"],
+                hints: [
+                    "Pista 1: Primero calcula el peso total del primer estante: 3/4 + 1/2 = 3/4 + 2/4 = 5/4 kg = 1.25 kg.",
+                    "Pista 2: Resta el peso que ya tiene el segundo estante: 1.25 kg - 0.4 kg."
+                ],
+                explanation: "¡Excelente! El peso del primer estante es 3/4 + 1/2 = 1.25 kg (o 5/4). Para equilibrar con 0.4 kg, se resta: 1.25 - 0.4 = 0.85 kg (o 17/20 kg)."
+            },
+            {
+                id: 3,
+                title: "Misión 3: La Pima de la Fracción del Tiempo",
+                topic: "Multiplicación, División y Parte de una Parte",
+                story: "Un reloj alquímico funciona con un depósito de agua misteriosa. El depósito contiene 2/3 de litro de líquido. Para activar la tercera cerradura, deben usar exactamente los 3/4 del líquido que hay en el depósito.",
+                visualSvg: `
+                    <svg width="260" height="90" viewBox="0 0 260 90" class="max-w-full">
+                        <rect x="20" y="15" width="220" height="60" rx="10" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+                        <!-- 2/3 fill -->
+                        <rect x="25" y="20" width="140" height="50" rx="6" fill="#0284c7" opacity="0.6"/>
+                        <text x="95" y="50" fill="#ffffff" font-size="14" font-weight="bold" text-anchor="middle">Líquido total: 2/3 Litro</text>
+                        <text x="200" y="50" fill="#f59e0b" font-size="12" font-weight="bold" text-anchor="middle">Usar 3/4 de 2/3</text>
+                    </svg>
+                `,
+                prompt: "¿Qué cantidad exacta de litro (en fracción simplificada o decimal) deben verter en la cerradura?",
+                validAnswers: ["1/2", "0.5", "0,5", "2/4", "3/6"],
+                hints: [
+                    "Pista 1: Recuerda que 'la parte de una parte' se calcula multiplicando las fracciones: (3/4) × (2/3).",
+                    "Pista 2: Multiplica numeradores (3×2=6) y denominadores (4×3=12), luego simplifica 6/12."
+                ],
+                explanation: "¡Perfecto! Al calcular (3/4) × (2/3) obtenemos 6/12, lo cual se simplifica a 1/2 litro (o 0.5 litros)."
+            },
+            {
+                id: 4,
+                title: "Misión 4: El Código de Enigma Combinado",
+                topic: "Operaciones Combinadas con Racionales",
+                story: "En la mesa principal descansa una caja de caudales con teclado numérico. Un grabado en la madera muestra la siguiente expresión combinada necesaria para obtener la clave de paso.",
+                visualSvg: `
+                    <div class="text-amber-300 font-mono text-xl sm:text-2xl font-bold bg-slate-900 px-6 py-4 rounded-lg border border-amber-500/40 text-center">
+                        ( 1.5 + 1/2 ) ÷ ( 4/5 - 0.3 )
+                    </div>
+                `,
+                prompt: "Resuelve la operación combinada para desbloquear la caja fuerte. ¿Cuál es el resultado exacto (número entero, decimal o fracción)?",
+                validAnswers: ["4", "4.0", "4,0", "20/5"],
+                hints: [
+                    "Pista 1: Resuelve el primer paréntesis: 1.5 + 1/2 = 1.5 + 0.5 = 2.",
+                    "Pista 2: Resuelve el segundo paréntesis: 4/5 - 0.3 = 0.8 - 0.3 = 0.5.",
+                    "Pista 3: Finalmente divide ambos resultados: 2 ÷ 0.5."
+                ],
+                explanation: "¡Impresionante! El primer paréntesis da (1.5 + 0.5) = 2. El segundo da (0.8 - 0.3) = 0.5. Al dividir 2 ÷ 0.5 obtenemos 4."
+            },
+            {
+                id: 5,
+                title: "Misión Final: La Salida del Gran Salón",
+                topic: "Resolución de Problemas Contextualizados y Argumentación",
+                story: "Han llegado a la gran puerta final. Para abrir la cerradura maestra, el guardián de la biblioteca les plantea una decisión presupuestaria: El grupo dispone de $120.000 para comprar suministros de escape. Un proveedor les ofrece un descuento de 1/4 del total, y otro proveedor les ofrece un descuento de 0.3 (30%) del total.",
+                visualSvg: `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full text-center">
+                        <div class="bg-slate-900 p-3 rounded-lg border border-emerald-500/40">
+                            <span class="text-xs text-slate-400">Oferta A:</span>
+                            <div class="text-emerald-400 font-bold text-base">Descuento de 1/4</div>
+                        </div>
+                        <div class="bg-slate-900 p-3 rounded-lg border border-blue-500/40">
+                            <span class="text-xs text-slate-400">Oferta B:</span>
+                            <div class="text-blue-400 font-bold text-base">Descuento de 0.3 (30%)</div>
+                        </div>
+                    </div>
+                `,
+                prompt: "¿Con qué oferta (Oferta A u Oferta B) pagan MENOS dinero y cuánto dinero se ahorran exactamente con esa mejor opción?",
+                validAnswers: ["oferta b", "b", "36000", "36.000", "oferta b 36000", "oferta b, 36000"],
+                hints: [
+                    "Pista 1: Calcula el descuento A: 1/4 de $120.000 = $120.000 ÷ 4 = $30.000 de ahorro.",
+                    "Pista 2: Calcula el descuento B: 0.3 de $120.000 = $120.000 × 0.3 = $36.000 de ahorro.",
+                    "Pista 3: Compara $30.000 con $36.000 de descuento. ¿Con cuál ahorras más?"
+                ],
+                explanation: "¡Brillante resolución! La Oferta A descuenta 1/4 ($30.000). La Oferta B descuenta 0.3 ($36.000). La Oferta B ofrece mayor descuento y permite pagar menos dinero."
+            }
+        ];
+
+        // Application State
+        let teamCode = "";
+        let currentMissionIndex = 0;
+        let currentHintLevel = 0;
+        let userRecords = []; // Records for learning evidence
+
+        // Elements
+        const screenSetup = document.getElementById('screenSetup');
+        const screenMission = document.getElementById('screenMission');
+        const screenSummary = document.getElementById('screenSummary');
+        const inputTeamCode = document.getElementById('inputTeamCode');
+        const teamBadge = document.getElementById('teamBadge');
+        const teamCodeDisplay = document.getElementById('teamCodeDisplay');
+
+        // Start Room function
+        function startEscapeRoom() {
+            const codeVal = inputTeamCode.value.trim();
+            if (!codeVal) {
+                alert("Por favor, ingresen un código o nombre de equipo para comenzar.");
+                return;
+            }
+            teamCode = codeVal;
+            teamCodeDisplay.innerText = teamCode;
+            teamBadge.classList.remove('hidden');
+
+            // Hide setup, show mission
+            screenSetup.classList.add('hidden');
+            screenMission.classList.remove('hidden');
+            screenMission.classList.add('flex');
+
+            playSound('unlock');
+            loadMission(0);
+        }
+
+        // Load specific mission content into the UI
+        function loadMission(index) {
+            currentMissionIndex = index;
+            currentHintLevel = 0;
+            const data = missionsData[index];
+
+            // Update Progress Bar
+            document.getElementById('progressText').innerText = `Misión ${index + 1} de ${missionsData.length}`;
+            for (let i = 1; i <= 5; i++) {
+                const stepEl = document.getElementById(`step${i}`);
+                if (i <= index + 1) {
+                    stepEl.className = "h-2.5 rounded-full bg-amber-500 transition-all duration-300";
+                } else {
+                    stepEl.className = "h-2.5 rounded-full bg-slate-800 transition-all duration-300";
+                }
+            }
+
+            // Update Keys Count
+            document.getElementById('keysCount').innerText = `${index} / 5`;
+
+            // Inject Content
+            document.getElementById('missionTag').innerText = `Misión ${data.id}: ${data.topic}`;
+            document.getElementById('missionTitle').innerText = data.title;
+            document.getElementById('missionStory').innerText = data.story;
+            document.getElementById('visualAidContainer').innerHTML = data.visualSvg;
+            document.getElementById('missionPrompt').innerText = data.prompt;
+
+            // Reset Form & Feedback
+            document.getElementById('inputAnswer').value = "";
+            document.getElementById('inputJustification').value = "";
+            hideFeedback();
+            hideHint();
+
+            // Auto-focus input
+            document.getElementById('inputAnswer').focus();
+        }
+
+        // Display or cycle hints
+        function toggleHint() {
+            const data = missionsData[currentMissionIndex];
+            const hintBox = document.getElementById('hintBox');
+            const hintText = document.getElementById('hintText');
+            const hintBadge = document.getElementById('hintLevelBadge');
+
+            if (hintBox.classList.contains('hidden')) {
+                hintBox.classList.remove('hidden');
+                currentHintLevel = 0;
+            } else {
+                currentHintLevel = (currentHintLevel + 1) % data.hints.length;
+            }
+
+            hintText.innerText = data.hints[currentHintLevel];
+            hintBadge.innerText = `(Pista ${currentHintLevel + 1}/${data.hints.length})`;
+        }
+
+        function hideHint() {
+            document.getElementById('hintBox').classList.add('hidden');
+        }
+
+        // Validate user answer and justification
+        function validateCurrentMission() {
+            const ansInput = document.getElementById('inputAnswer').value.trim().toLowerCase();
+            const justInput = document.getElementById('inputJustification').value.trim();
+            const data = missionsData[currentMissionIndex];
+
+            // Form validation: requires justification
+            if (!ansInput) {
+                showFeedback("⚠️ Deben ingresar una respuesta matemática.", "warning");
+                return;
+            }
+
+            if (justInput.length < 8) {
+                showFeedback("⚠️ Escriban una justificación breve explicando cómo llegaron al resultado (mínimo 8-10 caracteres). El razonamiento es clave para escapar.", "warning");
+                return;
+            }
+
+            // Check correctness
+            const isCorrect = data.validAnswers.some(valid => ansInput.includes(valid));
+
+            if (isCorrect) {
+                playSound('success');
+                showFeedback(`✅ ¡Excelente trabajo! ${data.explanation}`, "success");
+
+                // Save evidence
+                userRecords.push({
+                    missionId: data.id,
+                    topic: data.topic,
+                    answer: ansInput,
+                    justification: justInput,
+                    status: "Completada"
+                });
+
+                // Disable submit button temporarily
+                setTimeout(() => {
+                    if (currentMissionIndex + 1 < missionsData.length) {
+                        loadMission(currentMissionIndex + 1);
+                    } else {
+                        finishEscapeRoom();
+                    }
+                }, 2800);
+
+            } else {
+                playSound('error');
+                showFeedback("❌ La respuesta matemática no parece correcta. Revisen su procedimiento, consulten las pistas de la biblioteca e inténtenlo de nuevo.", "error");
+            }
+        }
+
+        function showFeedback(message, type) {
+            const fbBox = document.getElementById('feedbackBox');
+            fbBox.classList.remove('hidden', 'bg-emerald-950/80', 'border-emerald-500', 'text-emerald-200', 'bg-rose-950/80', 'border-rose-500', 'text-rose-200', 'bg-amber-950/80', 'border-amber-500', 'text-amber-200');
+
+            if (type === 'success') {
+                fbBox.classList.add('bg-emerald-950/80', 'border-emerald-500', 'text-emerald-200');
+            } else if (type === 'error') {
+                fbBox.classList.add('bg-rose-950/80', 'border-rose-500', 'text-rose-200');
+            } else {
+                fbBox.classList.add('bg-amber-950/80', 'border-amber-500', 'text-amber-200');
+            }
+
+            fbBox.innerText = message;
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedbackBox').classList.add('hidden');
+        }
+
+        // Finish Escape Room & Render Summary Worksheet
+        function finishEscapeRoom() {
+            playSound('unlock');
+            screenMission.classList.add('hidden');
+            screenMission.classList.remove('flex');
+            screenSummary.classList.remove('hidden');
+
+            document.getElementById('summaryTeamCode').innerText = teamCode;
+
+            const tbody = document.getElementById('summaryTableBody');
+            tbody.innerHTML = "";
+
+            userRecords.forEach(rec => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-900/50 transition";
+                tr.innerHTML = `
+                    <td class="py-3 px-3 font-semibold text-amber-300">Misión ${rec.missionId}<br><span class="text-xs text-slate-400 font-normal">${rec.topic}</span></td>
+                    <td class="py-3 px-3 font-mono text-slate-200">${escapeHtml(rec.answer)}</td>
+                    <td class="py-3 px-3 text-slate-300 text-xs sm:text-sm leading-snug">${escapeHtml(rec.justification)}</td>
+                    <td class="py-3 px-3 text-center"><span class="px-2 py-1 text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full font-bold">✓ Logrado</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Helper to sanitize HTML display
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Copy Record Summary to Clipboard
+        function copySummaryToClipboard() {
+            let formattedText = `HOJA DE REGISTRO - EL MISTERIO DE LOS RACIONALES\n`;
+            formattedText += `Equipo: ${teamCode}\n`;
+            formattedText += `Fecha: ${new Date().toLocaleDateString('es-CL')}\n`;
+            formattedText += `--------------------------------------------------\n\n`;
+
+            userRecords.forEach(rec => {
+                formattedText += `MISIÓN ${rec.missionId} (${rec.topic}):\n`;
+                formattedText += `- Respuesta: ${rec.answer}\n`;
+                formattedText += `- Justificación: ${rec.justification}\n\n`;
+            });
+
+            // Use document.execCommand fallback for iframe clipboard compatibility
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = formattedText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            
+            try {
+                document.execCommand('copy');
+                alert("¡Registro de evidencias copiado al portapapeles! Puedes pegarlo en Word o en Moodle.");
+            } catch (err) {
+                alert("No se pudo copiar automáticamente. Puedes seleccionar e imprimir esta pantalla.");
+            } finally {
+                document.body.removeChild(tempTextArea);
+            }
+        }
+    </script>
+</body>
+</html>
